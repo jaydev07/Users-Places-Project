@@ -1,11 +1,14 @@
 const HttpError = require("../models/http-error");
 const uuid = require('uuid');
 const {validationResult} =require('express-validator');
+const mongoose = require('mongoose');
 
 const Place = require('../models/place-model');
 const getCoordinatesByAddress = require("../util/location");
+const User = require('../models/user-model');
+const { Mongoose } = require("mongoose");
 
-/* DUMMY ARRAY
+/* DUMMY ARRAY    
 var DUMMY_PLACES= [{
     id:"p1",
     title:"Empire State building",
@@ -34,21 +37,26 @@ const getElementByUserId = async (req,res,next) => {
     */
 
     let placesFound;
+    let user;
     try{
         // Getting place by USERID
-        placesFound = await Place.find( { creator:userId } );
+        // Using Place Model
+        // placesFound = await Place.find( { creator:userId } );
+
+        // Using User Model & POPULATE METHOD
+        user = await User.findById(userId).populate('places');
     }catch(err){
         console.log(err);
         const error = new HttpError('Something went wrong!',500);
         return next(error);
     }
 
-    if(placesFound.length === 0){
+    if(user.places.length === 0){
         return next(new HttpError('Could not find the user!',404));
     }
 
     // Because placesFound is an Array we have to use MAP function  
-    res.json({palce: placesFound.map( place => place.toObject( { getters:true } ) ) } );
+    res.json({palce: user.places.map( place => place.toObject( { getters:true } ) ) } );
 }
 
 const getElementByPlaceId = async (req,res,next) => {
@@ -120,9 +128,37 @@ const createPlaces = async (req,res,next) => {
         creator
     });
 
-    // SAVING the document or thriwung error when it occurs
+    let user;
     try{
-        await createdPlace.save();
+        // Finding that the USER mentioned EXIXTS
+        user = await User.findById(creator);
+    }catch(err){
+        console.log(err);
+        return next(new HttpError('Could not add place!',500));
+    }
+
+    // If USER DOESNOT EXISTS
+    if(!user){
+        const error = new HttpError('Could not find thee User!',404);
+        return next(error);
+    }
+
+    // SAVING the document or throwing error when it occurs
+    try{
+        // Creating the Session because we have to UPDATE 2 Collections(USERS,PLACES) which are INDEPENDENT
+        const sess = await mongoose.startSession();
+        
+        // If any error occurs in between the TRANSACTION then it will br THROWN
+        sess.startTransaction();
+        
+        // Saving the PLACE into collection
+        await createdPlace.save({session:sess});
+        
+        // PUSHING the ID of PLACE into USERS COLLECTIONS
+        user.places.push(createdPlace);
+        await user.save({session:sess});
+        
+        sess.commitTransaction();
     }catch(err){
         return next(new HttpError('Could not able to save it.Please try again!'),500);
     }
@@ -194,18 +230,34 @@ const deletePlace = async (req,res,next) => {
 
     let place;
     try{
-        place = await Place.findById(placeId);
+        // POPULATE will give a whole USER object having placeID -> we can assess by "place.creator"
+        place = await Place.findById(placeId).populate('creator');
     }catch(err){
         console.group(err);
         const error = new HttpError('Someething went Wrong',500);
         return next(error);
     }
 
+    if(!place){
+        const error = new HttpError("Place not found",404);
+        return next(error);
+    }
+
+
     try{
-        await place.remove();
+        const sess = await mongoose.startSession();
+        sess.startTransaction();
+        await place.remove({session:sess});
+
+        // Now we can assess the User(having placeID) by "place.creator"
+        place.creator.places.pull(place);
+        await place.creator.save({session:sess});
+        
+        sess.commitTransaction();
+
     }catch(err){
         console.log(err);
-        const error = new HttpError('Someething went Wrong',500);
+        const error = new HttpError('Is not deleted',500);
         return next(error);
     }
 
