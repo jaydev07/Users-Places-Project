@@ -24,7 +24,7 @@ const getUsers = async (req,res,next) => {
         const error = new HttpError('Something wrong!',500);
         return next(error);
     }
-    res.json(users.map(user => user.toObject({getters:true})));
+    res.json({ users : users.map(user => user.toObject({getters:true})) });
 }   
 
 const signUp = async (req,res,next) => {
@@ -67,7 +67,7 @@ const signUp = async (req,res,next) => {
     
     // Condition for exestingUser
     if(exestingUser){
-        const error = new HttpError("User Already Exixts.Please Login!",422);
+        const error = new HttpError("User Already Exixts.Please Login!",500);
         return next(error);
     }
 
@@ -91,7 +91,7 @@ const signUp = async (req,res,next) => {
         return next(error);
     }
 
-    res.status(201);
+    // res.status(200);
     res.json(newUser.toObject({getters:true}));
 
 }
@@ -119,24 +119,18 @@ const logIn = async (req,res,next) => {
 
     let user;
     try{
-        user = await User.findOne({email:email});
+        user = await User.findOne( { email:email } );
     }catch(err){
         console.log(err);
         const error = new HttpError('Something wrong!',500);
         return next(error);
     }
 
-    if(user){
-        if(user.password === password){
-            res.json({message:"Login Successfull!"});
-        } 
-        else{
-            res.json({message:"Incorrect Password"});
-        }
+    if( !user || user.password !== password){
+        return next(new HttpError('Login Failed',500));
     }
-    else{
-        res.json({message:"User not found.Please Signup"});
-    }
+
+    res.json({message:"Login Successfull"});
 }
 
 exports.getUsers = getUsers;
