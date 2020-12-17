@@ -56,7 +56,7 @@ const getElementByUserId = async (req,res,next) => {
     }
 
     // Because placesFound is an Array we have to use MAP function  
-    res.json({palce: user.places.map( place => place.toObject( { getters:true } ) ) } );
+    res.json({place : user.places.map( place => place.toObject( { getters:true } ) ) } );
 }
 
 const getElementByPlaceId = async (req,res,next) => {
@@ -87,7 +87,7 @@ const getElementByPlaceId = async (req,res,next) => {
     }
 
     // To provide an "id" in the OUTPUT NOT "_id"
-    res.json({palce:place.toObject( { getters:true } )});
+    res.json({place:place.toObject( { getters:true } )});
 }
 
 const createPlaces = async (req,res,next) => {
@@ -139,7 +139,7 @@ const createPlaces = async (req,res,next) => {
 
     // If USER DOESNOT EXISTS
     if(!user){
-        const error = new HttpError('Could not find thee User!',404);
+        const error = new HttpError('Could not find the User!',404);
         return next(error);
     }
 
@@ -173,11 +173,11 @@ const updatePlace = async (req,res,next) => {
     if(!error.isEmpty()){
         return next(new HttpError('Invalid input.Please Check',422));
     }
-
-    /* Using DUMMY ARRAY
+     
     const {title,description} = req.body;
     const placeId = req.params.pid;
 
+    /* Using DUMMY ARRAY
     const placeFound = { ...DUMMY_PLACES.find((place) => {
         return place.id === placeId;
     })
@@ -269,4 +269,4 @@ exports.getElementByPlaceId = getElementByPlaceId;
 exports.getElementByUserId = getElementByUserId;
 exports.createPlaces = createPlaces;
 exports.updatePlace = updatePlace;
-exports.deletePlace = deletePlace;
+exports.deletePlace = deletePlace; 

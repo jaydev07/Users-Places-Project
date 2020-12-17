@@ -1,41 +1,76 @@
-import React from 'react';
+import React,{useContext, useEffect , useState} from 'react';
 import { useParams } from 'react-router-dom';
 
 import PlaceList from '../components/PlaceList';
-
- const DUMMY_PLACES = [
-  {
-    id: 'p1',
-    title: 'Empire State Building',
-    description: 'One of the most famous sky scrapers in the world!',
-    imageUrl:
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/NYC_Empire_State_Building.jpg/640px-NYC_Empire_State_Building.jpg',
-    address: '20 W 34th St, New York, NY 10001',
-    location: {
-      lat: 40.7484405,
-      lng: -73.9878584
-    },
-    creator: 'u1'
-  },
-  {
-    id: 'p2',
-    title: 'Empire State Building',
-    description: 'One of the most famous sky scrapers in the world!',
-    imageUrl:
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/NYC_Empire_State_Building.jpg/640px-NYC_Empire_State_Building.jpg',
-    address: '20 W 34th St, New York, NY 10001',
-    location: {
-      lat: 40.7484405,
-      lng: -73.9878584
-    },
-    creator: 'u2'
-  }
- ];
+import {AuthContext} from '../../shared/context/auth-context';
+import {useHttpClient} from "../../shared/hooks/http-fetch-hoock";
+import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
+import ErrorModal from "../../shared/components/UIElements/ErrorModal";
 
 const UserPlaces = () => {
+
+  // We have to mentain a state so that after reteriving the DATA from backend it will display
+  const [places, setLoadedPlaces] = useState(null);
+  
+  const [isLoading,setIsLoading] = useState(false);
+  const [error,setError] = useState();
+
   const userId = useParams().userId;
-  const loadedPlaces = DUMMY_PLACES.filter(place => place.creator === userId);
-  return <PlaceList items={loadedPlaces} />;
+
+  // USEEFFECT is used because This component will be rendered again-again but we have to TRIGGER this FUNCTION ONLY ONCE
+  useEffect( () => {
+    const fetchPlaces = async () => {
+      try{
+        setIsLoading(true);
+        const response = await fetch(`http://localhost:5000/api/places/user/${userId}`);
+
+        const responseData = await response.json();
+
+        if(response.message){
+          throw new Error(response.message);
+        }
+
+        setLoadedPlaces(responseData.place);
+        // console.log(responseData.place);
+
+        setIsLoading(false);
+      }catch(err){
+        setIsLoading(false);
+        console.log(err);
+        setError(err.message || 'Something wrong!');
+      }
+      
+    }
+
+    fetchPlaces();
+  },[userId]);
+  
+  const clearError = () => {
+    setError(null);
+  }
+
+  const handleDeletePlace = (deletedPlaceId) => {
+
+    // So after getting the DELETE-PLACE-ID we will FILTER IT & RERENDER
+    setLoadedPlaces((prevPlaces) => {
+      prevPlaces.filter((place) => {
+        return place.id !== deletedPlaceId;
+      })
+    });
+  }
+
+  return (
+    <React.Fragment>
+      <ErrorModal error={error} onClear={clearError} />
+      {isLoading && (
+        <div className="center">
+          <LoadingSpinner />
+        </div>
+      )}
+      { !isLoading && places && <PlaceList items={places} onDeletePlace={handleDeletePlace} />}
+    </React.Fragment>
+  );
 };
 
 export default UserPlaces;
+

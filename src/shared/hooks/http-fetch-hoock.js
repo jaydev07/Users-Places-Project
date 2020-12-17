@@ -24,30 +24,38 @@ export const useHttpClient = () => {
                 });
         
                 const responseData = await response.json();
+
+                activeHttpRequests.current = activeHttpRequests.current.filter(
+                    reqCtrl => reqCtrl !== httpAbortCtrl
+                )
         
-                if(!response.ok){
-                    throw new Error(responseData.message);
+                if(!response.ok ){
+                    setError(responseData.message);
+                    //throw new Error(responseData.message);
                 }
-        
+                setIsLoading(false);
                 return responseData
             }catch(err){
+                setIsLoading(false);
                 console.log(err);
                 setError(err.message);
+                throw err;
             }
-            setIsLoading(false);
+            
         }
     ,[]); 
 
-    const cancleError = () => {
+    const clearError = () => {
         setError(null);
     }
 
+    // Used whoen the components are changed & cancle th request
     useEffect(() => {
         return () => {
             activeHttpRequests.current.forEach(abortCtrl => abortCtrl.abort())
         }
     },[]);
 
-    return { isLoading , error, sendRequest , cancleError }
+    return { isLoading , error, sendRequest , clearError }
 
 }

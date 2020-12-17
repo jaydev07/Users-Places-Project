@@ -1,4 +1,5 @@
 import React, { useState,useContext } from 'react';
+import { useHistory } from 'react-router-dom';
 
 import Card from '../../shared/components/UIElements/Card';
 import Button from '../../shared/components/FormElements/Button';
@@ -6,8 +7,15 @@ import Modal from '../../shared/components/UIElements/Modal';
 import './PlaceItem.css';
 import Map from '../../shared/components/UIElements/Map';
 import {AuthContext} from "../../shared/context/auth-context";
+import {useHttpClient} from "../../shared/hooks/http-fetch-hoock";
+import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
+import ErrorModal from "../../shared/components/UIElements/ErrorModal";
 
 const PlaceItem = props => {
+
+  const {isLoading , error , sendRequest , clearError} = useHttpClient();
+
+  const history = useHistory();
 
   // Used to check Whether the USER is LOGGEDIN OR NOT
   const auth = useContext(AuthContext);
@@ -30,13 +38,30 @@ const PlaceItem = props => {
   }
 
   // CONFORMING the DELETE WARNING MODEL
-  const confirmDeleteHandeler = () => {
+  const confirmDeleteHandeler = async () => {
     setShowConfirmModel(false);
-    console.log("Deleting !");
+
+    try{
+      const response = await sendRequest(`http://localhost:5000/api/places/${props.id}`,
+        'DELETE',
+      );
+
+      // Now we will FILTER ALL THE PLACES OF THAT USER in "USERPLACES" component when it is RERENDERED
+      props.onDelete(props.id);
+      history.push(`/${auth.userId}/places`);
+    }catch(err){
+
+    }
+    
+
   }
 
   return (
     <React.Fragment>
+      <ErrorModal error={error} onClear={clearError} />
+      {isLoading && <div className="center">
+        <LoadingSpinner />
+      </div>}
       <Modal
         show={showMap}
         onCancel={closeMapHandler}
@@ -86,10 +111,12 @@ const PlaceItem = props => {
           <div className="place-item__actions">
             <Button inverse onClick={openMapHandler}>VIEW ON MAP</Button>
             {
-              auth.isLoggedIn && <Button to={`/places/${props.id}`}>EDIT</Button>
+              // EDIT BUTTON should only appear when USER IS CREATOR of that PLACE
+              auth.userId === props.creatorId && <Button to={`/places/${props.id}`}>EDIT</Button>
             }
             {
-              auth.isLoggedIn && <Button danger onClick={showDeleteWarningHandeler}>DELETE</Button>
+              // DELETE BUTTON should only appear when USER IS CREATOR of that PLACE
+              auth.userId === props.creatorId && <Button danger onClick={showDeleteWarningHandeler}>DELETE</Button>
             }
           
           </div>

@@ -13,6 +13,7 @@ import { AuthContext } from '../../shared/context/auth-context';
 import './Auth.css';
 import ErrorModel from "../../shared/components/UIElements/ErrorModal";
 import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
+import {useHttpClient} from '../../shared/hooks/http-fetch-hoock';
 
 const Auth = () => {
   const auth = useContext(AuthContext);
@@ -23,6 +24,8 @@ const Auth = () => {
 
   // When any ERROR OCCURS while RETERIVING THE DATA FROM DATABASE
   const [error,setError] = useState();
+
+  //const {isLoading , error ,sendRequest , clearError} = useHttpClient();
 
   const [formState, inputHandler, setFormData] = useForm(
     {
@@ -65,14 +68,16 @@ const Auth = () => {
     setIsLoginMode(prevMode => !prevMode);
   };
 
+  // handeling SUBMIT AND BACKEND
   const authSubmitHandler = async event => {
     event.preventDefault();
 
     // LOADING THE SCREEN WHILE THE DATA IS RETERIVED
-    setIsLoading(true);
+     setIsLoading(true);
 
     if (isLoginMode) {
 
+      // USING FETCH DIRECTLY
       try{
         const response = await fetch("http://localhost:5000/api/users/login",{
           method:"POST",
@@ -95,14 +100,18 @@ const Auth = () => {
         }
 
         setIsLoading(false);                                   // removing loading when data is arrived
-        auth.login();
+        
+        // Giving USERID to the FRONTEND for further use
+        auth.login(responseData.user.id);
+
       }catch(err){
         setIsLoading(false);
         console.log(err);
         setError(err.message || "Something went wrong!");
-      }
-    } 
+      } 
+    }  
     else {
+      // DIRECTLY USING FETCH 
       try {
         // Using FETCH for using API
         const response = await fetch('http://localhost:5000/api/users/signup', {
@@ -128,24 +137,47 @@ const Auth = () => {
 
         console.log(responseData);
         setIsLoading(false);                                   // removing loading when data is arrived
-        auth.login();
+        
+        // Giving USERID to the FRONTEND for further use
+        auth.login(responseData.user.id);
+
       } catch (err) {
         //Catching error
         setIsLoading(false);
         console.log(err);
         setError(err.message || "Something Went Wrong");
       }
-    }
+    
 
+      /* USING HOOCK
+      try{
+        await sendRequest('http://localhost:5000/api/users/signup',
+        'POST',
+        {
+          'Content-Type':'application/json'
+        },
+        JSON.stringify({
+          name:formState.inputs.name.value,
+          email:formState.inputs.email.value,
+          password:formState.inputs.password.value,
+        })
+        );
+
+        auth.login();
+      }catch(err){
+
+      }
+      */ 
+    }
   };
 
-  const errorHandler = () => {
+  const clearError = () => {
     setError(null);
-  } 
+  }
 
   return (
     <React.Fragment>
-      <ErrorModel error={error} onClear={errorHandler} />
+      <ErrorModel error={error} onClear={clearError} />
       <Card className="authentication">
 
         {/* Showing the loading screen */}

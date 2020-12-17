@@ -18,13 +18,19 @@ const App = () => {
 
   const [isLoggedIn , setLoggedIn] = useState(false);
 
+  // To maintain the userID comming from BACKEND 
+  const [userId , setUserId ] = useState(null);
+
   // useCallback is Used to avoid RECREATION OF FUNCTION & to avoid INFINITE LOOPS
-  const login = useCallback(() => {
+  const login = useCallback((uid) => {
     setLoggedIn(true);
+    // useing the userID
+    setUserId(uid);
   },[])
 
-  const logout = useCallback(() => {
+  const logout = useCallback((uid) => {
     setLoggedIn(false);
+    setUserId(null);
   },[]);
 
   let routes;
@@ -72,6 +78,7 @@ const App = () => {
     // And VALUE contains the object passed in the "createContext"
     <AuthContext.Provider value={{
       isLoggedIn : isLoggedIn,
+      userId:userId,
       login:login,
       logout:logout
     }}>

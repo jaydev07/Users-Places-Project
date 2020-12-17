@@ -20,7 +20,7 @@ const NavLinks = props => {
     {/* MY PLACES will only render when isLoggedIn is TRUE */}
     { 
       auth.isLoggedIn && <li>
-      <NavLink to="/u1/places">MY PLACES</NavLink>
+      <NavLink to={`/${auth.userId}/places`}>MY PLACES</NavLink>
     </li> 
     }
 

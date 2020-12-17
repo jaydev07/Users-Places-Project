@@ -92,7 +92,7 @@ const signUp = async (req,res,next) => {
     }
 
     // res.status(200);
-    res.json(newUser.toObject({getters:true}));
+    res.json({user:newUser.toObject({getters:true})} );
 
 }
 
@@ -130,7 +130,7 @@ const logIn = async (req,res,next) => {
         return next(new HttpError('Login Failed',500));
     }
 
-    res.json({message:"Login Successfull"});
+    res.json({message:"Login Successfull",user:user.toObject({getters:true})});
 }
 
 exports.getUsers = getUsers;
