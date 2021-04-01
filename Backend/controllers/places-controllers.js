@@ -1,3 +1,5 @@
+const fs = require('fs');
+
 const HttpError = require("../models/http-error");
 const uuid = require('uuid');
 const {validationResult} =require('express-validator');
@@ -122,7 +124,7 @@ const createPlaces = async (req,res,next) => {
     const createdPlace = new Place({
         title,
         description,
-        image:"https://picsum.photos/200/300",
+        image:req.file.path,
         location:coordinates,
         address,
         creator
@@ -243,6 +245,7 @@ const deletePlace = async (req,res,next) => {
         return next(error);
     }
 
+    const imagePath = place.image;
 
     try{
         const sess = await mongoose.startSession();
@@ -260,6 +263,11 @@ const deletePlace = async (req,res,next) => {
         const error = new HttpError('Is not deleted',500);
         return next(error);
     }
+
+    // For deleting the image from backend
+    fs.unlink(imagePath, err => {
+        console.log(err);
+    });
 
     res.status(200).json({message:"Deleted Item!"});
 

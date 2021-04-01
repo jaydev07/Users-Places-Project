@@ -1,3 +1,7 @@
+// For deleting file if the error occured in signup route
+const fs = require('fs');
+const path = require('path');
+
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
@@ -8,6 +12,9 @@ const userRoutes = require('./routes/users-routes');
 const HttpError = require('./models/http-error');
 
 app.use(bodyParser.json());
+
+// Giving the image files to the frontend
+app.use('/uploads/images', express.static(path.join('uploads','images')))
 
 // We should add this at last because it is use to patch the BACKEND - FRONTEND 
 app.use((req,res,next) => {
@@ -30,6 +37,12 @@ app.use((req,res,next) => {
 })
 
 app.use((error,req,res,next) => {
+    // Removing the file from the folder with given path
+    if(req.file){
+        fs.unlink(req.file.path , (err) => {
+            console.log(err);
+        })
+    }
 
     // If the response is already given
     if(res.headerSent){
@@ -41,7 +54,7 @@ app.use((error,req,res,next) => {
 })
 
 mongoose
-    .connect('mongodb+srv://admin-jaydev:jd123@cluster0.48tad.mongodb.net/mern?retryWrites=true&w=majority',)
+    .connect('mongodb+srv://admin-jaydev:jd123@cluster0.48tad.mongodb.net/mern?retryWrites=true&w=majority',{ useNewUrlParser: true,useUnifiedTopology: true  })
     .then(() => {
         app.listen(5000,() => {
             console.log("Server is listening on 5000");

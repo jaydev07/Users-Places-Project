@@ -76,8 +76,8 @@ const signUp = async (req,res,next) => {
         name,
         email,
         password,
-        image:"https://picsum.photos/200/300",
-
+        // Storing image path in users database
+        image: req.file.path,
         // Initially places array will be EMPTY
         // When we add a place & in Place MODEL when we mention USER-ID then this place array will be UPDATED
         places:[]

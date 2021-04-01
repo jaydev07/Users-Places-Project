@@ -3,6 +3,7 @@ const router = express.Router();
 const { check } = require('express-validator');
 
 const placeControllers = require('../controllers/places-controllers');
+const fileUpload = require("../middleware/file-upload");
 
 router.get("/user/:uid",placeControllers.getElementByUserId);
 
@@ -10,6 +11,7 @@ router.get("/:pid",placeControllers.getElementByPlaceId);
 
 // To create New Places
 router.post("/",
+    fileUpload.single('image'),
     //Now this line of codes will be executed left to right
     //Checks the input(req.body)
     //But RESULTS are given in the function
