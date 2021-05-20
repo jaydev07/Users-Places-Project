@@ -1,4 +1,7 @@
 const uuid = require('uuid');
+const bcrypt = require('bcryptjs');
+const jwt = require("jsonwebtoken");
+
 const HttpError = require('../models/http-error');
 const {validationResult} = require('express-validator');
 
@@ -71,11 +74,20 @@ const signUp = async (req,res,next) => {
         return next(error);
     }
 
+    let hashedPassword;
+    try{
+        hashedPassword = await bcrypt.hash(password, 12);
+    }catch(err){
+        console.log(err);
+        const error = new HttpError('Could not create user.Please try again!',500);
+        return next(error);
+    }
+
     // Adding the new user
     const newUser = new User({
         name,
         email,
-        password,
+        password:hashedPassword,
         // Storing image path in users database
         image: req.file.path,
         // Initially places array will be EMPTY
@@ -91,8 +103,22 @@ const signUp = async (req,res,next) => {
         return next(error);
     }
 
+    let token;
+    try{
+        // Creating a JWT token 
+        token = jwt.sign(
+            { userId:newUser.id, email:newUser.email},
+            "JdIsAwesome",
+            { expiresIn:'1h'}
+        );
+    }catch(err){
+        console.log(err);
+        const error = new HttpError('Something wrong!',500);
+        return next(error);
+    }
+
     // res.status(200);
-    res.json({user:newUser.toObject({getters:true})} );
+    res.json({userId: newUser.id, email:newUser.email , token:token} );
 
 }
 
@@ -126,11 +152,42 @@ const logIn = async (req,res,next) => {
         return next(error);
     }
 
-    if( !user || user.password !== password){
-        return next(new HttpError('Login Failed',500));
+    if(!user){
+        return next(new HttpError('User not exists.Please Signup!',500));
     }
 
-    res.json({message:"Login Successfull",user:user.toObject({getters:true})});
+    let isValidPassword=false;
+    try{
+        isValidPassword = await bcrypt.compare(password , user.password);
+    }catch(err){
+        console.log(err);
+        const error = new HttpError('Something wrong!',500);
+        return next(error);
+    }
+
+    if(!isValidPassword){
+        const error = new HttpError('Incorrect Password!',500);
+        return next(error);
+    }
+
+    let token;
+    try{
+        token = jwt.sign(
+            { userId: user.id, email:user.email},
+            "JdIsAwesome",
+            { expiresIn:'1h'}
+        );
+    }catch(err){
+        console.log(err);
+        const error = new HttpError('Something wrong!',500);
+        return next(error);
+    }
+
+    res.json({
+        userId:user.id,
+        email:user.email,
+        token:token
+    });
 }
 
 exports.getUsers = getUsers;
