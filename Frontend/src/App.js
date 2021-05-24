@@ -16,27 +16,27 @@ import {AuthContext} from './shared/context/auth-context';
 
 const App = () => {
 
-  const [isLoggedIn , setLoggedIn] = useState(false);
+  const [token , setToken] = useState();
 
   // To maintain the userID comming from BACKEND 
   const [userId , setUserId ] = useState(null);
 
   // useCallback is Used to avoid RECREATION OF FUNCTION & to avoid INFINITE LOOPS
-  const login = useCallback((uid) => {
-    setLoggedIn(true);
+  const login = useCallback((uid, token) => {
+    setToken(token);
     // useing the userID
     setUserId(uid);
   },[])
 
   const logout = useCallback((uid) => {
-    setLoggedIn(false);
+    setToken(null);
     setUserId(null);
   },[]);
 
   let routes;
 
   //Seperating different routes for Loggedin
-  if(isLoggedIn){
+  if(token){
     routes= (
       <Switch>
         <Route path="/" exact>
@@ -77,7 +77,8 @@ const App = () => {
     
     // And VALUE contains the object passed in the "createContext"
     <AuthContext.Provider value={{
-      isLoggedIn : isLoggedIn,
+      isLoggedIn : !!token,
+      token:token,
       userId:userId,
       login:login,
       logout:logout

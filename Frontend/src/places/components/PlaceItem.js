@@ -44,6 +44,9 @@ const PlaceItem = props => {
     try{
       const response = await sendRequest(`http://localhost:5000/api/places/${props.id}`,
         'DELETE',
+        {
+          'Authorization':'Bearer ' + auth.token
+        }
       );
 
       // Now we will FILTER ALL THE PLACES OF THAT USER in "USERPLACES" component when it is RERENDERED

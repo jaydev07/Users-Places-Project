@@ -102,14 +102,14 @@ const Auth = () => {
 
         console.log(responseData);
 
-        if(responseData.message !== "Login Successfull"){
+        if(responseData.message){
           throw Error(responseData.message);
         }
 
         setIsLoading(false);                                   // removing loading when data is arrived
         
         // Giving USERID to the FRONTEND for further use
-        auth.login(responseData.user.id);
+        auth.login(responseData.userId ,responseData.token);
 
       }catch(err){
         setIsLoading(false);
@@ -147,7 +147,7 @@ const Auth = () => {
         setIsLoading(false);                                   // removing loading when data is arrived
         
         // Giving USERID to the FRONTEND for further use
-        auth.login(responseData.user.id);
+        auth.login(responseData.userId , responseData.token);
 
       } catch (err) {
         //Catching error

@@ -97,6 +97,7 @@ const UpdatePlaces = () => {
             const response = await sendRequest(`http://localhost:5000/api/places/${placeId}`,
                 'PATCH',
                 {
+                    'Authorization': 'Bearer ' + auth.token,
                     'Content-Type':'application/json'
                 },
                 JSON.stringify({
