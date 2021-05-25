@@ -15,7 +15,7 @@ module.exports = (req,res,next) => {
             throw new Error("Authentication failed!");
         }
         // This gives us a payload  
-        const decodedToken = jwt.verify(token , "JdIsAwesome");
+        const decodedToken = jwt.verify(token , process.env.JWT_KEY);
         req.userData = { userId:decodedToken.userId };
         next();
     }catch(err){

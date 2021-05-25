@@ -108,7 +108,7 @@ const signUp = async (req,res,next) => {
         // Creating a JWT token 
         token = jwt.sign(
             { userId:newUser.id, email:newUser.email},
-            "JdIsAwesome",
+            process.env.JWT_KEY,
             { expiresIn:'1h'}
         );
     }catch(err){
@@ -174,7 +174,7 @@ const logIn = async (req,res,next) => {
     try{
         token = jwt.sign(
             { userId: user.id, email:user.email},
-            "JdIsAwesome",
+            process.env.JWT_KEY,
             { expiresIn:'1h'}
         );
     }catch(err){

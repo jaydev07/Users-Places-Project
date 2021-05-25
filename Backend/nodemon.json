@@ -1,0 +1,8 @@
+{
+    "env":{
+        "DB_USER":"admin-jaydev",
+        "DB_PASSWORD":"jd123",
+        "DB_NAME":"mern",
+        "JWT_KEY":"JdIsAwesome"
+    }
+}
