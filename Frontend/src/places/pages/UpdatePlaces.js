@@ -48,7 +48,7 @@ const UpdatePlaces = () => {
       const fetchdata = async () => {
           try{
             // GET request for getting PLACE
-            const response = await sendRequest(`http://localhost:5000/api/places/${placeId}`);
+            const response = await sendRequest( process.env.REACT_APP_BACKEND_URL + `/places/${placeId}`);
 
             // Updating the STATE with the RESPONSE GIVEN
             setLoadedPlace(response.place);
@@ -94,7 +94,7 @@ const UpdatePlaces = () => {
         event.preventDefault();
 
         try{
-            const response = await sendRequest(`http://localhost:5000/api/places/${placeId}`,
+            await sendRequest( process.env.REACT_APP_BACKEND_URL + `/places/${placeId}`,
                 'PATCH',
                 {
                     'Authorization': 'Bearer ' + auth.token,

@@ -1,4 +1,4 @@
-import Rect,{useCallback,useState,useEffect} from "react";
+import {useCallback,useState,useEffect} from "react";
 
 let logoutTimer;
 

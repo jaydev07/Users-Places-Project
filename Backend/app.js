@@ -56,7 +56,7 @@ app.use((error,req,res,next) => {
 mongoose
     .connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.48tad.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`,{ useNewUrlParser: true,useUnifiedTopology: true  })
     .then(() => {
-        app.listen(5000,() => {
+        app.listen(process.env.PORT || 5000,() => {
             console.log("Server is listening on 5000");
         });
     })

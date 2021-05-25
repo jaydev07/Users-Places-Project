@@ -1,9 +1,7 @@
-import React,{useContext, useEffect , useState} from 'react';
+import React,{useEffect , useState} from 'react';
 import { useParams } from 'react-router-dom';
 
 import PlaceList from '../components/PlaceList';
-import {AuthContext} from '../../shared/context/auth-context';
-import {useHttpClient} from "../../shared/hooks/http-fetch-hoock";
 import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
 import ErrorModal from "../../shared/components/UIElements/ErrorModal";
 
@@ -22,7 +20,7 @@ const UserPlaces = () => {
     const fetchPlaces = async () => {
       try{
         setIsLoading(true);
-        const response = await fetch(`http://localhost:5000/api/places/user/${userId}`);
+        const response = await fetch( process.env.REACT_APP_BACKEND_URL + `/places/user/${userId}`);
 
         const responseData = await response.json();
 

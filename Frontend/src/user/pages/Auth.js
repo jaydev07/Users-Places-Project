@@ -13,7 +13,6 @@ import { AuthContext } from '../../shared/context/auth-context';
 import './Auth.css';
 import ErrorModel from "../../shared/components/UIElements/ErrorModal";
 import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
-import {useHttpClient} from '../../shared/hooks/http-fetch-hoock';
 import ImageUpload from "../../shared/components/FormElements/ImageUpload";
 
 const Auth = () => {
@@ -86,7 +85,7 @@ const Auth = () => {
 
       // USING FETCH DIRECTLY
       try{
-        const response = await fetch("http://localhost:5000/api/users/login",{
+        const response = await fetch( process.env.REACT_APP_BACKEND_URL + "/users/login",{
           method:"POST",
           headers:{
             'Content-Type':'application/json'    // Please write this thing PERFECTLY
@@ -129,7 +128,7 @@ const Auth = () => {
         formData.append('image',formState.inputs.image.value);
 
         // Using FETCH for using API
-        const response = await fetch('http://localhost:5000/api/users/signup', {
+        const response = await fetch( process.env.REACT_APP_BACKEND_URL + '/users/signup', {
           method: 'POST',                                  
           body: formData
         });

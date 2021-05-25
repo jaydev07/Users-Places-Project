@@ -14,8 +14,6 @@ const Users = () => {
   // We have to store the USERS in a STATE because we are fetching from DATABASE
   const [dataArrived ,setDataArrived] = useState();
 
-  let USERS;
-
   // We have to use USEFFECT because it will not create INFINITE LOOP for FETCH
   useEffect(() => {
     const fetchUsers = async () => {
@@ -45,7 +43,7 @@ const Users = () => {
       
       */
 
-      const resposedata = await sendRequest('http://localhost:5000/api/users/');
+      const resposedata = await sendRequest( process.env.REACT_APP_BACKEND_URL + '/users/');
       setDataArrived(resposedata.users);
     }
 

@@ -1,4 +1,4 @@
-import React,{useCallback,useReducer, useContext} from 'react';
+import React,{ useContext} from 'react';
 import {useHistory} from 'react-router-dom';
 
 import './NewPlace.css';
@@ -50,7 +50,7 @@ const NewPlace = () => {
       formData.append('address' , formState.inputs.address.value);
       formData.append('image' , formState.inputs.image.value);
       
-      await sendRequest('http://localhost:5000/api/places/',
+      await sendRequest(process.env.REACT_APP_BACKEND_URL + '/places/',
         'POST',
         {
           Authorization:'Bearer ' + auth.token
