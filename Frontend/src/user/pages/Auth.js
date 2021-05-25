@@ -143,11 +143,11 @@ const Auth = () => {
           throw Error(responseData.message);
         }
 
-        console.log(responseData);
         setIsLoading(false);                                   // removing loading when data is arrived
         
         // Giving USERID to the FRONTEND for further use
         auth.login(responseData.userId , responseData.token);
+        console.log(responseData.userId);
 
       } catch (err) {
         //Catching error

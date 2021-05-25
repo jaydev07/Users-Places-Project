@@ -103,7 +103,7 @@ const createPlaces = async (req,res,next) => {
     }
 
     // DESTRUCTURING input from body
-    const { title , description ,  address , creator } = req.body;
+    const { title , description ,  address } = req.body;
 
     const coordinates = getCoordinatesByAddress(address);
 
@@ -127,13 +127,13 @@ const createPlaces = async (req,res,next) => {
         image:req.file.path,
         location:coordinates,
         address,
-        creator
+        creator:req.userData.userId
     });
 
     let user;
     try{
         // Finding that the USER mentioned EXIXTS
-        user = await User.findById(creator);
+        user = await User.findById(req.userData.userId);
     }catch(err){
         console.log(err);
         return next(new HttpError('Could not add place!',500));

@@ -1,4 +1,4 @@
-import React,{useCallback,useState} from 'react';
+import React,{useCallback,useState, useEffect} from 'react';
 import {
   BrowserRouter as Router,
   Route,
@@ -13,25 +13,11 @@ import MainNavigation from './shared/components/Navigation/MainNavigation';
 import UpdatePlaces from './places/pages/UpdatePlaces';
 import Auth from './user/pages/Auth';
 import {AuthContext} from './shared/context/auth-context';
+import {useAuth} from "./shared/hooks/auth-hook";
 
 const App = () => {
 
-  const [token , setToken] = useState();
-
-  // To maintain the userID comming from BACKEND 
-  const [userId , setUserId ] = useState(null);
-
-  // useCallback is Used to avoid RECREATION OF FUNCTION & to avoid INFINITE LOOPS
-  const login = useCallback((uid, token) => {
-    setToken(token);
-    // useing the userID
-    setUserId(uid);
-  },[])
-
-  const logout = useCallback((uid) => {
-    setToken(null);
-    setUserId(null);
-  },[]);
+  const {token,userId,login,logout} = useAuth();
 
   let routes;
 
