@@ -166,7 +166,7 @@ const logIn = async (req,res,next) => {
     }
 
     if(!isValidPassword){
-        const error = new HttpError('Incorrect Password!',500);
+        const error = new HttpError('Incorrect Password!',403);
         return next(error);
     }
 
