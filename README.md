@@ -1,5 +1,5 @@
 # Your-Places 
-* [YourPlaces Project Link](https://yourplaces-f5a74.web.app/)
+* [Project Link](https://yourplaces-f5a74.web.app/)
 
 ---
 ## Description
