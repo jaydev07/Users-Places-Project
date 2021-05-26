@@ -64,7 +64,7 @@ const signUp = async (req,res,next) => {
         exestingUser = await User.findOne({ email: email });
     }catch(err){
         console.log(err);
-        const error = new HttpError('Something wrong!',500);
+        const error = new HttpError('Something wrong in finding user!',500);
         return next(error);
     }
     
@@ -99,7 +99,7 @@ const signUp = async (req,res,next) => {
         await newUser.save();
     }catch(err){
         console.log(err);
-        const error = new HttpError('Something wrong!',500);
+        const error = new HttpError('Something wrong!.User not saved',500);
         return next(error);
     }
 
@@ -113,7 +113,7 @@ const signUp = async (req,res,next) => {
         );
     }catch(err){
         console.log(err);
-        const error = new HttpError('Something wrong!',500);
+        const error = new HttpError('Something wrong!. Token not created',500);
         return next(error);
     }
 
@@ -148,7 +148,7 @@ const logIn = async (req,res,next) => {
         user = await User.findOne( { email:email } );
     }catch(err){
         console.log(err);
-        const error = new HttpError('Something wrong!',500);
+        const error = new HttpError('Something wrong in finding user!',500);
         return next(error);
     }
 
@@ -161,7 +161,7 @@ const logIn = async (req,res,next) => {
         isValidPassword = await bcrypt.compare(password , user.password);
     }catch(err){
         console.log(err);
-        const error = new HttpError('Something wrong!',500);
+        const error = new HttpError('Something wrong in bcrypt compare!',500);
         return next(error);
     }
 
@@ -179,7 +179,7 @@ const logIn = async (req,res,next) => {
         );
     }catch(err){
         console.log(err);
-        const error = new HttpError('Something wrong!',500);
+        const error = new HttpError('Something wrong. Token not created',500);
         return next(error);
     }
 

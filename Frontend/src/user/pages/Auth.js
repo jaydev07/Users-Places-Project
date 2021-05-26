@@ -185,10 +185,10 @@ const Auth = () => {
   return (
     <React.Fragment>
       <ErrorModel error={error} onClear={clearError} />
+      {/* Showing the loading screen */}
+      {isLoading && <LoadingSpinner asOverlay />}
+      
       <Card className="authentication">
-
-        {/* Showing the loading screen */}
-        {isLoading && <LoadingSpinner asOverlay />}
 
         <h2>Login Required</h2>
         <hr />
